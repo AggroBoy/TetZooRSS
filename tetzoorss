@@ -1,0 +1,26 @@
+#!/usr/bin/env zsh
+
+# Set up RVM
+if [[ -f $HOME/.rvm/scripts/rvm ]]; then
+    source "$HOME/.rvm/scripts/rvm"
+elif [[ -f /etc/profile.d/rvm.sh ]]; then
+    source /etc/profile.d/rvm.sh
+else
+    echo RVM not found
+    exit
+fi
+
+# Get the directory we're running in
+DIR=$(dirname $(perl -e 'use Cwd "abs_path";print abs_path(shift)' $0))
+
+rvm $(cat $DIR/.ruby-version)@$(cat $DIR/.ruby-gemset)
+
+# Find some Ruby script to run based on the name of this script
+if [[ -f $DIR/bin/$(basename $0).rb ]] then
+    ruby -I $DIR/lib $DIR/bin/$(basename $0).rb $@
+elif [[ -f $DIR/bin/$(basename $0) ]] then
+    ruby -I $DIR/lib $DIR/bin/$(basename $0) $@
+else
+    echo 'so, um...?'
+fi
+
